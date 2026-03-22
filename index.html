@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en" data-astro-cid-j7pv25f6> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cave of Szaznak</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"><style>[data-astro-cid-j7pv25f6]{margin:0;padding:0;box-sizing:border-box}body{background:#05030a;width:100vw;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center}#game[data-astro-cid-j7pv25f6]{display:block;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default}#overlay[data-astro-cid-j7pv25f6]{position:fixed;bottom:0;left:50%;transform:translate(-50%);width:min(100vw,calc(100dvh * 16 / 9));padding:12px 20px 14px;background:#05030aee;border-top:2px solid #3c3248;color:#f0e8e0;font-family:"Press Start 2P",monospace;font-size:clamp(9px,1.4vmin,16px);line-height:1.9;letter-spacing:.05em;text-shadow:0 0 8px #c0a0ff88;opacity:0;transition:opacity .2s;pointer-events:none;white-space:pre-wrap;word-break:break-word}#overlay[data-astro-cid-j7pv25f6].visible{opacity:1}#overlay[data-astro-cid-j7pv25f6].label-mode{color:#a080d8;text-shadow:0 0 6px #6040b0aa;border-top-color:#5030a0;font-size:clamp(7px,1vmin,12px);padding:8px 20px 10px}#no-webgpu[data-astro-cid-j7pv25f6]{position:fixed;inset:0;background:#05030a;color:#f0e8e0;font-family:"Press Start 2P",monospace;font-size:8px;line-height:2.2;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;gap:16px}
+</style></head> <body data-astro-cid-j7pv25f6> <canvas id="game" data-astro-cid-j7pv25f6></canvas> <div id="overlay" aria-live="polite" data-astro-cid-j7pv25f6></div> <div id="no-webgpu" data-astro-cid-j7pv25f6> <div data-astro-cid-j7pv25f6>WebGPU not available</div> <div style="color:#887880;font-size:6px" data-astro-cid-j7pv25f6>Try Chrome 113+ or Edge 113+</div> </div> <script type="module">
+    import { startGame } from '/src/game/game.ts';
+
+    const canvas = document.getElementById('game');
+    const overlay = document.getElementById('overlay');
+    const noWebgpu = document.getElementById('no-webgpu');
+
+    function resize() {
+      const ratio = 320 / 180;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      if (vw / vh > ratio) {
+        canvas.style.height = vh + 'px';
+        canvas.style.width = (vh * ratio) + 'px';
+      } else {
+        canvas.style.width = vw + 'px';
+        canvas.style.height = (vw / ratio) + 'px';
+      }
+    }
+
+    canvas.width = 320;
+    canvas.height = 180;
+    resize();
+    window.addEventListener('resize', resize);
+
+    if (!navigator.gpu) {
+      canvas.style.display = 'none';
+      overlay.style.display = 'none';
+      noWebgpu.style.display = 'flex';
+    } else {
+      startGame(canvas, overlay).catch(err => {
+        console.error(err);
+        canvas.style.display = 'none';
+        overlay.style.display = 'none';
+        noWebgpu.style.display = 'flex';
+        noWebgpu.children[0].textContent = 'Failed: ' + err.message;
+      });
+    }
+  </script> </body> </html>
